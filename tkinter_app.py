@@ -1,7 +1,19 @@
 import tkinter as tk
 
 database = {}
+try:
+    with open("users.txt", "r") as f:
+        for line in f:
+            if ":" in line:
+                user, pwd = line.strip().split(":", 1)
+                database[user] = pwd
+except FileNotFoundError:
+    pass
 
+def save_to_file():
+    with open("users.txt", "w") as f:
+        for user, pwd in database.items():
+            f.write(user + ":" + pwd + "\n")
 def register():
     rwindow = tk.Toplevel(root)
     rwindow.title("Register")
@@ -24,6 +36,7 @@ def register():
                 tk.Label(rwindow, text="User already exists", fg="red").pack(pady=5)
             else:
                 database[login] = password
+                save_to_file()
                 tk.Label(rwindow, text="Registered successfully", fg="green").pack(pady=5)
                 rwindow.after(2000, rwindow.destroy)
         else:
