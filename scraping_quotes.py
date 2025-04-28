@@ -4,30 +4,41 @@ import pandas as pd
 import time
 
 driver = webdriver.Chrome()
-driver.get("https://quotes.toscrape.com/")
+driver.get("https://www.ebay.com/sch/i.html?_nkw=laptop")
 time.sleep(2)
 
-quotes_elements = driver.find_elements(By.CLASS_NAME, "quote")
+product_elements = driver.find_elements(By.CLASS_NAME, "s-item")
 
-quotes_list = []
-authors_list = []
-book_names_list = []
+product_names = []
+prices = []
+descriptions = []
 
-for element in quotes_elements:
-    quote_text = element.find_element(By.CLASS_NAME, "text").text
-    author_name = element.find_element(By.CLASS_NAME, "author").text
-    book_name = element.find_element(By.CLASS_NAME, "keywords").text if element.find_elements(By.CLASS_NAME, "keywords") else "Not available"
+for element in product_elements:
+    try:
+        product_name = element.find_element(By.CLASS_NAME, "s-item__title").text
+    except:
+        product_name = "Not available"
     
-    quotes_list.append(quote_text)
-    authors_list.append(author_name)
-    book_names_list.append(book_name)
+    try:
+        price = element.find_element(By.CLASS_NAME, "s-item__price").text
+    except:
+        price = "Not available"
+    
+    try:
+        description = element.find_element(By.CLASS_NAME, "s-item__description").text
+    except:
+        description = "Not available"
+    
+    product_names.append(product_name)
+    prices.append(price)
+    descriptions.append(description)
 
 df = pd.DataFrame({
-    "Quote": quotes_list,
-    "Author": authors_list,
-    "Book Name": book_names_list
+    "Product Name": product_names,
+    "Price": prices,
+    "Description": descriptions
 })
 
-df.to_excel("scraped_quotes_extended.xlsx", index=False)
+df.to_excel("scraped_ebay_products.xlsx", index=False)
 
 driver.quit()
